@@ -47,9 +47,9 @@ class CacheService
      * 
      * @param string currency
      * 
-     * @return int
+     * @return float
      */
-    public function getRate(string $currency): int
+    public function getRate(string $currency): float
     {
         $lastUpdate = $this->cache->get('last_update');
 
@@ -58,6 +58,6 @@ class CacheService
         }
 
         $rate = $this->cache->get($currency);
-        return (int)$rate;
+        return (float)$rate;
     }
 }

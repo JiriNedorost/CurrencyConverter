@@ -8,14 +8,14 @@ use Illuminate\Http\Client\Factory as HttpClient;
 class ApiService
 {
     /**
-     *  Guzzle HttpClient
-     *  @var http
+     * Guzzle HttpClient
+     * @var http
      */
     private $http;
 
     /**
-     *  Currencies database model
-     *  @var currencies
+     * Currencies database model
+     * @var currencies
      */
     private $currencies;
 
@@ -45,6 +45,19 @@ class ApiService
             }
 
             $this->currencies->insert($insert);
+        }
+    }
+
+    /**
+     *  Returns an array of all current rates from the specified API or nothing on failed request
+     * 
+     *  @return array|void
+     */
+    public function getAllRates(): ?array
+    {
+        $response = $this->http->retry(3, 1000)->get(config('services.openexchange.endpoint') . '/latest.json?app_id='. config('services.openexchange.secret'));
+        if ($response->successful()) {
+            return $response->json()['rates'];
         }
     }
 }

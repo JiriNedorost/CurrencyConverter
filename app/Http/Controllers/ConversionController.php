@@ -33,7 +33,9 @@ class ConversionController extends Controller
             $to = session()->get('to');
 
             $convertedAmount = $this->converter->convertCurrency($from, $to, $amount);
-            $displayData = ['convertedAmount' => $convertedAmount, 'convertedTo' => $to, 'originalAmount' => $amount, 'convertedFrom' => $from,];
+            if ($convertedAmount) { //if this returns 0, don't show any values
+                $displayData = ['convertedAmount' => $convertedAmount, 'convertedTo' => $to, 'originalAmount' => $amount, 'convertedFrom' => $from,];
+            }
         }
 
         //Get stats

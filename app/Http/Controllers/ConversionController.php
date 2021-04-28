@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Conversions;
 use App\Models\Currencies;
 use App\Services\ConverterService;
 use Illuminate\Validation\Rule;
@@ -11,17 +12,20 @@ class ConversionController extends Controller
 {
     private $currencies;
     private $converter;
+    private $conversions;
 
-    public function __construct(Currencies $currencies, ConverterService $converter)
+    public function __construct(Currencies $currencies, ConverterService $converter, Conversions $conversions)
     {
         $this->currencies = $currencies;
         $this->converter = $converter;
+        $this->conversions = $conversions;
     }
 
     public function index()
     {
         $allCurrencies = $this->currencies->pluck('combined_name')->all(); //get all currencies from DB
 
+        //Get submitted values and pass them to template in array
         $displayData = [];
         if (session()->get('redir')) {
             $amount = session()->get('amount');
@@ -32,12 +36,17 @@ class ConversionController extends Controller
             $displayData = ['convertedAmount' => $convertedAmount, 'convertedTo' => $to, 'originalAmount' => $amount, 'convertedFrom' => $from,];
         }
 
+        //Get stats
+        $mostConverted = $this->conversions->select('destination_currency')->groupBy('destination_currency')->orderByRaw('COUNT(*) DESC')->limit(1)->first()->destination_currency;
+        $totalConversions = $this->conversions->count('id');
+        $totalConverted = round($this->conversions->sum('amount'), 2);
+
         return view('index', array_merge(
             [
                 'currencies' => $allCurrencies,
-                'mostConvertedCurr' => 'Test',
-                'totalConversions' => 1,
-                'totalConverted' => 2,
+                'mostConvertedCurr' => $mostConverted,
+                'totalConversions' => $totalConversions,
+                'totalConverted' => $totalConverted,
             ],
             $displayData
         ));

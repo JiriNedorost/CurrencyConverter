@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Conversions;
 use App\Models\Currencies;
 use App\Services\CacheService;
 
@@ -19,10 +20,17 @@ class ConverterService
      */
     private $currencies;
 
-    public function __construct(CacheService $cache, Currencies $currencies)
+    /**
+     * Conversions DB model
+     * @var conversions
+     */
+    private $conversions;
+
+    public function __construct(CacheService $cache, Currencies $currencies, Conversions $conversions)
     {
         $this->cache = $cache;
         $this->currencies = $currencies;
+        $this->conversions = $conversions;
     }
 
     /**
@@ -44,6 +52,12 @@ class ConverterService
 
         $rateFrom = $this->cache->getRate($fromSymbol);
         $rateTo = $this->cache->getRate($toSymbol);
+
+        //Save stats of this conversion to DB
+        $this->conversions->original_currency = $from;
+        $this->conversions->destination_currency = $to;
+        $this->conversions->amount = $amount/$rateFrom; //Amount is in USD
+        $this->conversions->save();
 
         return ($amount/$rateFrom)*$rateTo;
     }

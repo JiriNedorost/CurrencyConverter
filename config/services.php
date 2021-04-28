@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'OpenExchange' => [
+    'openexchange' => [
         'domain' => env('OPENEXCHANGE_DOMAIN'),
         'secret' => env('OPENEXCHANGE_APPID'),
         'endpoint' => env('OPENEXCHANGE_ENDPOINT'),

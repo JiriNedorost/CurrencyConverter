@@ -45,11 +45,11 @@ class CacheService
      * Gets selected currency from cache
      * If last update is more than 1 hour ago, it refreshes rates first
      * 
-     * @param currency
+     * @param string currency
      * 
      * @return int
      */
-    public function getRate($currency): int
+    public function getRate(string $currency): int
     {
         $lastUpdate = $this->cache->get('last_update');
 

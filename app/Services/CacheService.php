@@ -30,14 +30,34 @@ class CacheService
      * 
      * @return void
      */
-    public function saveAllRatesToCache(): void
+    private function saveAllRatesToCache(): void
     {
         $rates = $this->api->getAllRates();
         if (is_array($rates)) {
             $this->cache->forever('last_update', time());
-            foreach($rates as $currency => $rate) {
+            foreach ($rates as $currency => $rate) {
                 $this->cache->forever($currency, $rate);
             }
         }
+    }
+
+    /**
+     * Gets selected currency from cache
+     * If last update is more than 1 hour ago, it refreshes rates first
+     * 
+     * @param currency
+     * 
+     * @return int
+     */
+    public function getRate($currency): int
+    {
+        $lastUpdate = $this->cache->get('last_update');
+
+        if ($lastUpdate < time()-60*60 ) {
+            $this->saveAllRatesToCache();
+        }
+
+        $rate = $this->cache->get($currency);
+        return (int)$rate;
     }
 }

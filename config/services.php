@@ -14,6 +14,12 @@ return [
     |
     */
 
+    'OpenExchange' => [
+        'domain' => env('OPENEXCHANGE_DOMAIN'),
+        'secret' => env('OPENEXCHANGE_APPID'),
+        'endpoint' => env('OPENEXCHANGE_ENDPOINT'),
+    ],
+
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Interfaces\CurrencyApiInterface;
 use App\Models\Currencies;
+use Illuminate\Config\Repository as Config;
 use Illuminate\Http\Client\Factory as HttpClient;
 
 class OpenExchangeCurrencyApiService implements CurrencyApiInterface
@@ -18,10 +19,16 @@ class OpenExchangeCurrencyApiService implements CurrencyApiInterface
      */
     private Currencies $currencies;
 
-    public function __construct(HttpClient $http, Currencies $currencies)
+    /**
+     *  Config retriever
+     */
+    private Config $config;
+
+    public function __construct(HttpClient $http, Currencies $currencies, Config $config)
     {
         $this->http = $http;
         $this->currencies = $currencies;
+        $this->config = $config;
     }
 
     /**
@@ -33,7 +40,8 @@ class OpenExchangeCurrencyApiService implements CurrencyApiInterface
      */
     public function saveAllCurrencies(): void
     {
-        $response = $this->http->retry(3, 1000)->get(config('services.openexchange.endpoint') . "/currencies.json");
+        $response = $this->http->retry(3, 1000)
+            ->get($this->config->get('services.openexchange.endpoint') . "/currencies.json");
         if ($response->successful()) {
 
             $insert = [];
@@ -49,7 +57,6 @@ class OpenExchangeCurrencyApiService implements CurrencyApiInterface
                 $this->currencies->truncate();
                 $this->currencies->insert($insert);
             }
-            
         }
     }
 
@@ -60,7 +67,8 @@ class OpenExchangeCurrencyApiService implements CurrencyApiInterface
      */
     public function getAllRates(): array
     {
-        $response = $this->http->retry(3, 1000)->get(config('services.openexchange.endpoint') . '/latest.json?app_id=' . config('services.openexchange.secret'));
+        $response = $this->http->retry(3, 1000)
+            ->get($this->config->get('services.openexchange.endpoint') . '/latest.json?app_id=' . $this->config->get('services.openexchange.secret'));
         if ($response->successful()) {
             return $response->json()['rates'];
         }

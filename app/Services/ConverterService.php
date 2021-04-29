@@ -12,27 +12,23 @@ class ConverterService
 {
     /**
      * CacheService object
-     * @var cache
      */
-    private $cache;
+    private CacheService $cache;
 
     /**
      * Currencies DB model
-     * @var currencies
      */
-    private $currencies;
+    private Currencies $currencies;
 
     /**
      * Conversions DB model
-     * @var conversions
      */
-    private $conversions;
+    private Conversions $conversions;
 
     /**
      * ApiService object
-     * @var ApiService
      */
-    private $api;
+    private ApiService $api;
 
     public function __construct(CacheService $cache, Currencies $currencies, Conversions $conversions, ApiService $api)
     {
@@ -46,24 +42,24 @@ class ConverterService
      * Converts Specified amount from one currency to another
      * All currencies are coverted using USD as base
      * 
-     * @param string from Requires specific format as saved in table Currencies - combined_name column
-     * @param string to Requires specific format as saved in table Currencies - combined_name column
-     * @param float amount
+     * @param string $from Requires specific format as saved in table Currencies - combined_name column
+     * @param string $to Requires specific format as saved in table Currencies - combined_name column
+     * @param float $amount
      * 
      * @return float
      * @throws Exception when supplied with invalid to or from field
      */
     public function convertCurrency(string $from, string $to, float $amount): float
     {
-        $fromSymbol = $this->currencies->where('combined_name', $from)->first()->symbol;
-        $toSymbol = $this->currencies->where('combined_name', $to)->first()->symbol;
+        $fromSymbol = $this->currencies->where('combined_name', $from)->first();
+        $toSymbol = $this->currencies->where('combined_name', $to)->first();
 
-        $rateFrom = $this->cache->getRate($fromSymbol);
-        $rateTo = $this->cache->getRate($toSymbol);
+        $rateFrom = (float)$this->cache->getRate($fromSymbol->symbol);
+        $rateTo = (float)$this->cache->getRate($toSymbol->symbol);
 
-        if($rateFrom == 0 or $rateTo == 0) { //If either is 0, we don't have them in currencies cache, maybe they were removed from API by provider? Reload currencies in DB
-            $this->api->getAllCurrencies();
-            return 0;
+        if ($rateFrom === 0.0 or $rateTo === 0.0) { //If either is 0, we don't have them in currencies cache, maybe they were removed from API by provider? Reload currencies in DB
+            $this->api->saveAllCurrencies();
+            return 0.0;
         }
 
         //Save stats of this conversion to DB

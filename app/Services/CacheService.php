@@ -9,15 +9,13 @@ class CacheService
 {
     /**
      * ApiService object
-     * @var api
      */
-    private $api;
+    private ApiService $api;
 
     /**
      * Instance of cache repository
-     * @var cache
      */
-    private $cache;
+    private CacheRepository $cache;
 
     public function __construct(ApiService $api, CacheRepository $cache)
     {
@@ -36,7 +34,8 @@ class CacheService
         if (is_array($rates)) {
             $this->cache->forever('last_update', time());
             foreach ($rates as $currency => $rate) {
-                $this->cache->forever($currency, $rate);
+
+                $this->cache->forever((string)$currency, $rate);
             }
         }
     }
@@ -45,7 +44,7 @@ class CacheService
      * Gets selected currency from cache
      * If last update is more than 1 hour ago, it refreshes rates first
      * 
-     * @param string currency
+     * @param string $currency
      * 
      * @return float
      */

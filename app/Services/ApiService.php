@@ -9,15 +9,13 @@ class ApiService
 {
     /**
      * Guzzle HttpClient
-     * @var http
      */
-    private $http;
+    private HttpClient $http;
 
     /**
      * Currencies database model
-     * @var currencies
      */
-    private $currencies;
+    private Currencies $currencies;
 
     public function __construct(HttpClient $http, Currencies $currencies)
     {
@@ -32,18 +30,18 @@ class ApiService
      * 
      * @return void
      */
-    public function getAllCurrencies(): void
+    public function saveAllCurrencies(): void
     {
         $response = $this->http->retry(3, 1000)->get(config('services.openexchange.endpoint') . "/currencies.json");
         if ($response->successful()) {
 
-            $this->currencies->truncate();
-
+            $insert = [];
             $allCurrencies = $response->json();
             foreach ($allCurrencies as $shortcut => $fullName) {
                 $insert[] = ['symbol' => $shortcut, 'name' => $fullName, 'combined_name' => $shortcut . ' - ' . $fullName];
             }
 
+            $this->currencies->truncate();
             $this->currencies->insert($insert);
         }
     }
@@ -51,13 +49,15 @@ class ApiService
     /**
      *  Returns an array of all current rates from the specified API or nothing on failed request
      * 
-     *  @return array|void
+     *  @return array<string>
      */
-    public function getAllRates(): ?array
+    public function getAllRates(): array
     {
-        $response = $this->http->retry(3, 1000)->get(config('services.openexchange.endpoint') . '/latest.json?app_id='. config('services.openexchange.secret'));
+        $response = $this->http->retry(3, 1000)->get(config('services.openexchange.endpoint') . '/latest.json?app_id=' . config('services.openexchange.secret'));
         if ($response->successful()) {
             return $response->json()['rates'];
         }
+
+        return array();
     }
 }

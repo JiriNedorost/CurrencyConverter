@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 
 class ConversionController extends Controller
 {
-    private $currencies;
-    private $converter;
-    private $conversions;
+    private Currencies $currencies;
+    private ConverterService $converter;
+    private Conversions $conversions;
 
     public function __construct(Currencies $currencies, ConverterService $converter, Conversions $conversions)
     {
@@ -21,9 +21,11 @@ class ConversionController extends Controller
         $this->conversions = $conversions;
     }
 
-    public function index()
+    public function index(): \Illuminate\View\View
     {
-        $allCurrencies = $this->currencies->pluck('combined_name')->all(); //get all currencies from DB
+        $allCurrencies = $this->currencies
+            ->pluck('combined_name')
+            ->all(); //get all currencies from DB
 
         //Get submitted values and pass them to template in array
         $displayData = [];
@@ -32,14 +34,20 @@ class ConversionController extends Controller
             $from = session()->get('from');
             $to = session()->get('to');
 
-            $convertedAmount = $this->converter->convertCurrency($from, $to, $amount);
+            $convertedAmount = $this->converter->convertCurrency($from, $to, (float)$amount);
             if ($convertedAmount) { //if this returns 0, don't show any values
                 $displayData = ['convertedAmount' => $convertedAmount, 'convertedTo' => $to, 'originalAmount' => $amount, 'convertedFrom' => $from,];
             }
         }
 
         //Get stats
-        $mostConverted = $this->conversions->select('destination_currency')->groupBy('destination_currency')->orderByRaw('COUNT(*) DESC')->limit(1)->first()->destination_currency;
+        $mostConverted = $this->conversions
+            ->select('destination_currency')
+            ->groupBy('destination_currency')
+            ->orderByRaw('COUNT(*) DESC')
+            ->limit(1)
+            ->first()
+            ->destination_currency;
         $totalConversions = $this->conversions->count('id');
         $totalConverted = round($this->conversions->sum('amount'), 2);
 
@@ -54,9 +62,8 @@ class ConversionController extends Controller
         ));
     }
 
-    public function convert(Request $request)
+    public function convert(Request $request): \Illuminate\Http\RedirectResponse
     {
-
         $allCurrencies = $this->currencies->pluck('combined_name')->all();
 
         $request->validate([
@@ -65,6 +72,14 @@ class ConversionController extends Controller
             'to' => ['required', Rule::in($allCurrencies)],
         ]);
 
-        return redirect()->route('index')->withInput()->with(['redir' => 'true', 'amount' => $request->amount, 'from' => $request->from, 'to' => $request->to,]);
+        return redirect()
+            ->route('index')
+            ->withInput()
+            ->with([
+                'redir' => 'true',
+                'amount' => $request->amount,
+                'from' => $request->from,
+                'to' => $request->to,
+            ]);
     }
 }

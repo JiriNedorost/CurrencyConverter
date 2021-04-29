@@ -2,12 +2,12 @@
 
 namespace Tests\Unit;
 
-use App\Services\CacheService;
+use App\Services\FileSystemCurrencyCacheService;
 use Mockery;
 use Tests\TestCase;
 use Illuminate\Cache\Repository as CacheRepository;
 
-class CacheServiceTest extends TestCase
+class FileSystemCacheServiceTest extends TestCase
 {
     private CacheRepository $cache;
 
@@ -21,12 +21,12 @@ class CacheServiceTest extends TestCase
 
     public function test_rates_are_retrieved_from_cache()
     {
-        $mockedApiService = Mockery::mock('App\Services\ApiService');
+        $mockedApiService = Mockery::mock('App\Interfaces\CurrencyApiInterface');
         $mockedApiService->shouldReceive('getAllRates')
             ->once()
             ->andReturn($this->mockResponse());
 
-        (new CacheService($mockedApiService, $this->cache))->getRate('CZK');
+        (new FileSystemCurrencyCacheService($mockedApiService, $this->cache))->getRate('CZK');
         
         $eur = $this->cache->get('EUR');
         $czk = $this->cache->get('CZK');
@@ -40,12 +40,12 @@ class CacheServiceTest extends TestCase
         $oldValue = 20.0001;
         $this->cache->forever('CZK', $oldValue);
 
-        $mockedApiService = Mockery::mock('App\Services\ApiService');
+        $mockedApiService = Mockery::mock('App\Interfaces\CurrencyApiInterface');
         $mockedApiService->shouldReceive('getAllRates')
             ->once()
             ->andReturn($this->mockResponse());
 
-        (new CacheService($mockedApiService, $this->cache))->getRate('CZK');
+        (new FileSystemCurrencyCacheService($mockedApiService, $this->cache))->getRate('CZK');
         
         $czk = $this->cache->get('CZK');
 

@@ -2,22 +2,23 @@
 
 namespace App\Services;
 
-use App\Interfaces\ApiInterface;
+use App\Interfaces\CurrencyApiInterface;
+use App\Interfaces\CurrencyCacheInterface;
 use Illuminate\Cache\Repository as CacheRepository;
 
-class CacheService
+class FileSystemCurrencyCacheService implements CurrencyCacheInterface
 {
     /**
      * ApiService object
      */
-    private ApiInterface $api;
+    private CurrencyApiInterface $api;
 
     /**
      * Instance of cache repository
      */
     private CacheRepository $cache;
 
-    public function __construct(ApiInterface $api, CacheRepository $cache)
+    public function __construct(CurrencyApiInterface $api, CacheRepository $cache)
     {
         $this->api = $api;
         $this->cache = $cache;

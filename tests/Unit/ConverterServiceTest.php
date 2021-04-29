@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Conversions;
 use App\Models\Currencies;
-use App\Services\ApiService;
+use App\Interfaces\CurrencyApiInterface;
 use App\Services\ConverterService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -16,7 +16,7 @@ class ConverterServiceTest extends TestCase
 
     private Currencies $currencies;
     private Conversions $conversions;
-    private ApiService $api;
+    private CurrencyApiInterface $api;
 
     use RefreshDatabase;
 
@@ -28,7 +28,7 @@ class ConverterServiceTest extends TestCase
 
         $this->currencies = $this->app->make('App\Models\Currencies');
         $this->conversions = $this->app->make('App\Models\Conversions');
-        $this->api = $this->app->make('App\Services\ApiService');
+        $this->api = $this->app->make('App\Interfaces\CurrencyApiInterface');
     }
 
     public function test_currencies_conversion_returns_the_same_amount_if_currencies_are_equal()
@@ -37,7 +37,7 @@ class ConverterServiceTest extends TestCase
         $to = "EUR - Euro";
         $amount = 10;
 
-        $mockedCacheService = Mockery::mock('App\Services\CacheService');
+        $mockedCacheService = Mockery::mock('App\Interfaces\CurrencyCacheInterface');
         $mockedCacheService->shouldReceive('getRate')
             ->times(2)
             ->andReturn(0.836564, 0.836564);
@@ -53,7 +53,7 @@ class ConverterServiceTest extends TestCase
         $to = "CZK - Czech Republic Koruna";
         $amount = 10;
 
-        $mockedCacheService = Mockery::mock('App\Services\CacheService');
+        $mockedCacheService = Mockery::mock('App\Interfaces\CurrencyCacheInterface');
         $mockedCacheService->shouldReceive('getRate')
             ->times(2)
             ->andReturn(0.836564, 23.56987);

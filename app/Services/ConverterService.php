@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\Conversions;
 use App\Models\Currencies;
-use App\Interfaces\ApiInterface;
-use App\Services\CacheService;
+use App\Interfaces\CurrencyApiInterface;
+use App\Interfaces\CurrencyCacheInterface;
 use Exception;
 
 class ConverterService
@@ -13,7 +13,7 @@ class ConverterService
     /**
      * CacheService object
      */
-    private CacheService $cache;
+    private CurrencyCacheInterface $cache;
 
     /**
      * Currencies DB model
@@ -26,11 +26,11 @@ class ConverterService
     private Conversions $conversions;
 
     /**
-     * ApiInterface object
+     * CurrencyApiInterface object
      */
-    private ApiInterface $api;
+    private CurrencyApiInterface $api;
 
-    public function __construct(CacheService $cache, Currencies $currencies, Conversions $conversions, ApiInterface $api)
+    public function __construct(CurrencyCacheInterface $cache, Currencies $currencies, Conversions $conversions, CurrencyApiInterface $api)
     {
         $this->cache = $cache;
         $this->currencies = $currencies;

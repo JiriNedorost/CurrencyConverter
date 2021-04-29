@@ -21,7 +21,7 @@ class ConversionController extends Controller
         $this->conversions = $conversions;
     }
 
-    public function index(): \Illuminate\View\View
+    public function index(Request $request): \Illuminate\View\View
     {
         $allCurrencies = $this->currencies
             ->pluck('combined_name')
@@ -29,10 +29,10 @@ class ConversionController extends Controller
 
         //Get submitted values and pass them to template in array
         $displayData = [];
-        if (session()->get('redir')) {
-            $amount = session()->get('amount');
-            $from = session()->get('from');
-            $to = session()->get('to');
+        if ($request->session()->get('redir')) {
+            $amount = $request->session()->get('amount');
+            $from = $request->session()->get('from');
+            $to = $request->session()->get('to');
 
             $convertedAmount = $this->converter->convertCurrency($from, $to, (float)$amount);
             if ($convertedAmount) { //if this returns 0, don't show any values

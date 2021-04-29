@@ -2,15 +2,18 @@
 
 namespace App\Providers;
 
-use App\Interfaces\ApiInterface;
-use App\Services\ApiService;
+use App\Interfaces\CurrencyApiInterface;
+use App\Interfaces\CurrencyCacheInterface;
+use App\Services\FileSystemCurrencyCacheService;
+use App\Services\OpenExchangeCurrencyApiService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
 
     public $bindings = [
-        ApiInterface::class => ApiService::class,
+        CurrencyApiInterface::class => OpenExchangeCurrencyApiService::class,
+        CurrencyCacheInterface::class => FileSystemCurrencyCacheService::class,
     ];
 
     

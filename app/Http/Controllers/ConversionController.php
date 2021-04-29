@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Conversions;
-use App\Models\Currencies;
+use App\Repository\ConversionsInterface;
+use App\Repository\CurrenciesInterface;
 use App\Services\ConverterService;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
 class ConversionController extends Controller
 {
-    private Currencies $currencies;
     private ConverterService $converter;
-    private Conversions $conversions;
+    private ConversionsInterface $conversions;
+    private CurrenciesInterface $currencies;
 
-    public function __construct(Currencies $currencies, ConverterService $converter, Conversions $conversions)
+    public function __construct(CurrenciesInterface $currencies, ConverterService $converter, ConversionsInterface $conversions)
     {
         $this->currencies = $currencies;
         $this->converter = $converter;
@@ -23,9 +23,7 @@ class ConversionController extends Controller
 
     public function index(Request $request): \Illuminate\View\View
     {
-        $allCurrencies = $this->currencies
-            ->pluck('combined_name')
-            ->all(); //get all currencies from DB
+        $allCurrencies = $this->currencies->getAllCurrencies();
 
         //Get submitted values and pass them to template in array
         $displayData = [];
@@ -40,23 +38,12 @@ class ConversionController extends Controller
             }
         }
 
-        //Get stats
-        $mostConverted = $this->conversions
-            ->select('destination_currency')
-            ->groupBy('destination_currency')
-            ->orderByRaw('COUNT(*) DESC')
-            ->limit(1)
-            ->first()
-            ->destination_currency;
-        $totalConversions = $this->conversions->count('id');
-        $totalConverted = round($this->conversions->sum('amount'), 2);
-
         return view('index', array_merge(
             [
                 'currencies' => $allCurrencies,
-                'mostConvertedCurr' => $mostConverted,
-                'totalConversions' => $totalConversions,
-                'totalConverted' => $totalConverted,
+                'mostConvertedCurr' => $this->conversions->getMostConverted(),
+                'totalConversions' => $this->conversions->getTotalConversions(),
+                'totalConverted' => $this->conversions->getTotalConverted(),
             ],
             $displayData
         ));
@@ -64,7 +51,7 @@ class ConversionController extends Controller
 
     public function convert(Request $request): \Illuminate\Http\RedirectResponse
     {
-        $allCurrencies = $this->currencies->pluck('combined_name')->all();
+        $allCurrencies = $this->currencies->getAllCurrencies();
 
         $request->validate([
             'amount' => 'required|numeric|gte:0',

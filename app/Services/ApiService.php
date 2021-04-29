@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
+use App\Interfaces\ApiInterface;
 use App\Models\Currencies;
 use Illuminate\Http\Client\Factory as HttpClient;
 
-class ApiService
+class ApiService implements ApiInterface
 {
     /**
      * Guzzle HttpClient

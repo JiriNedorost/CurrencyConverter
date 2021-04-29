@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Services\ApiService;
+use App\Interfaces\ApiInterface;
 use Illuminate\Cache\Repository as CacheRepository;
 
 class CacheService
@@ -10,14 +10,14 @@ class CacheService
     /**
      * ApiService object
      */
-    private ApiService $api;
+    private ApiInterface $api;
 
     /**
      * Instance of cache repository
      */
     private CacheRepository $cache;
 
-    public function __construct(ApiService $api, CacheRepository $cache)
+    public function __construct(ApiInterface $api, CacheRepository $cache)
     {
         $this->api = $api;
         $this->cache = $cache;

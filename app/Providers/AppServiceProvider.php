@@ -2,10 +2,18 @@
 
 namespace App\Providers;
 
+use App\Interfaces\ApiInterface;
+use App\Services\ApiService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+
+    public $bindings = [
+        ApiInterface::class => ApiService::class,
+    ];
+
+    
     /**
      * Register any application services.
      *

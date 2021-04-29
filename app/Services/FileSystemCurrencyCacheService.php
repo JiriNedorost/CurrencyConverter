@@ -53,7 +53,8 @@ class FileSystemCurrencyCacheService implements CurrencyCacheInterface
     {
         $lastUpdate = $this->cache->get('last_update');
 
-        if ($lastUpdate < time()-60*60 ) {
+        $timeToRefreshCache = 3600; //Time in seconds after which cache will be refreshed //TODO move to config
+        if ($lastUpdate < time()-$timeToRefreshCache ) {
             $this->saveAllRatesToCache();
         }
 

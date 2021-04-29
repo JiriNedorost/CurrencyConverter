@@ -50,8 +50,8 @@ class OpenExchangeCurrencyApiService implements CurrencyApiInterface
             $allCurrencies = $response->json();
             foreach ($allCurrencies as $shortcut => $fullName) {
                 $insert[] = ['symbol' => $shortcut, 'name' => $fullName, 'combined_name' => $shortcut . ' - ' . $fullName];
-                $shortcut === 'USD' ? $usd = true : false;
-                $shortcut === 'EUR' ? $eur = true : false;
+                $shortcut === 'USD' && ($usd = true);
+                $shortcut === 'EUR' && ($eur = true);
             }
             if (count($insert) && $usd && $eur) { //check if array has any rows and some major currencies are present
                 $this->currencies->truncate();

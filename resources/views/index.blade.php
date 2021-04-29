@@ -14,12 +14,15 @@
     <h1>Currency Conversion Calculator</h1>
     <div>
 
-        @if ($errors->any())
+        @if ($errors->any() or isset($errorResult))
         <div class="alert alert-danger">
             <ul>
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
+                @isset ($errorResult)
+                    <li>{{ $errorResult }}</li>
+                @endisset
             </ul>
         </div>
         @endif

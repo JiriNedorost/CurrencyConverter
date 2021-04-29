@@ -33,8 +33,10 @@ class ConversionController extends Controller
             $to = $request->session()->get('to');
 
             $convertedAmount = $this->converter->convertCurrency($from, $to, (float)$amount);
-            if ($convertedAmount) { //if this returns 0, don't show any values
+            if ($convertedAmount) { //if this returns 0 and requested amount was not 0, return error
                 $displayData = ['convertedAmount' => $convertedAmount, 'convertedTo' => $to, 'originalAmount' => $amount, 'convertedFrom' => $from,];
+            } elseif ($amount !== '0') {
+                $displayData = ['errorResult' => 'Remote API is currently unavailable. Please try again later.'];
             }
         }
 

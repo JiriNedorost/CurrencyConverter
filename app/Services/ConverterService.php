@@ -51,11 +51,11 @@ class ConverterService
      */
     public function convertCurrency(string $from, string $to, float $amount): float
     {
-        $fromSymbol = $this->currencies->where('combined_name', $from)->first();
-        $toSymbol = $this->currencies->where('combined_name', $to)->first();
+        $fromSymbol = $this->currencies->where('combined_name', $from)->first()->symbol;
+        $toSymbol = $this->currencies->where('combined_name', $to)->first()->symbol;
 
-        $rateFrom = (float)$this->cache->getRate($fromSymbol->symbol);
-        $rateTo = (float)$this->cache->getRate($toSymbol->symbol);
+        $rateFrom = (float)$this->cache->getRate($fromSymbol);
+        $rateTo = (float)$this->cache->getRate($toSymbol);
 
         if ($rateFrom === 0.0 or $rateTo === 0.0) { //If either is 0, we don't have them in currencies cache, maybe they were removed from API by provider? Reload currencies in DB
             $this->api->saveAllCurrencies();

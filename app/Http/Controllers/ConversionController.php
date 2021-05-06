@@ -56,7 +56,7 @@ class ConversionController extends Controller
         $allCurrencies = $this->currencies->getAllCurrencies();
 
         $request->validate([
-            'amount' => 'required|numeric|gte:0',
+            'amount' => 'required|numeric|gte:0|lte:1e20',
             'from' => ['required', Rule::in($allCurrencies)],
             'to' => ['required', Rule::in($allCurrencies)],
         ]);

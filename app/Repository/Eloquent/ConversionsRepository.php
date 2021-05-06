@@ -29,10 +29,13 @@ class ConversionsRepository implements ConversionsInterface
             ->groupBy('destination_currency')
             ->orderByRaw('COUNT(*) DESC')
             ->limit(1)
-            ->first()
-            ->destination_currency;
-
-        return $mostConverted;
+            ->first();
+        if ($mostConverted) {
+            return $mostConverted->destination_currency;
+        } else {
+            return "No conversions yet";
+        }
+        
     }
 
     /**

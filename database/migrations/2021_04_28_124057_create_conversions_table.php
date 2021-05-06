@@ -18,7 +18,7 @@ class CreateConversionsTable extends Migration
             $table->timestamps();
             $table->string('original_currency');
             $table->string('destination_currency');
-            $table->float('amount');
+            $table->double('amount', 40, 2);
         });
     }
 
